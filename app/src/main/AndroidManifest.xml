@@ -1,0 +1,27 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.full.wasah">
+    <application android:allowBackup="true"
+        android:label="@string/app_name"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme"
+        android:name=".Util.ReservaApplication">
+    <activity
+        android:name="com.full.wasah.Vista.MainActivity">
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
+    </activity>
+        <activity android:name=".Vista.AdminActivity"/>
+    <meta-data
+        android:name="com.google.android.geo.API_KEY"
+        android:value="AIzaSyB5uAC-IPmNU_qyXjLkOPbG0CCSHmZymSI"/>
+
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="f42a654e0464391069248b3d3e0ba186a5a70499" />
+    </application>
+    <uses-permission android:name="android.permission.INTERNET" />
+</manifest>

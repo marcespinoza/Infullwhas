@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:background="@drawable/full"
+    android:weightSum="3">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        android:layout_weight="2">
+
+        <ImageButton
+            android:id="@+id/imageBtn"
+            android:layout_margin="8dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/menu"
+            android:background="@android:color/transparent"
+            android:onClick="showPopup" />
+
+   <ImageView
+       android:id="@+id/imagen"
+       android:layout_width="300dp"
+       android:layout_height="55dp"
+       android:layout_gravity="center"
+       android:layout_marginTop="05dp"
+       android:src="@drawable/logo_fullwhas"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="25 de mayo 1.041 - Salto Bs. As. \n +542474415422"
+        android:gravity="center"
+        android:fontFamily="@font/roboto_thin"
+        android:clickable="true"/>
+
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/input_fecha"
+            android:layout_gravity="center"
+            android:layout_width="150dp"
+            android:layout_height="50dp"
+            android:layout_margin="10dp">
+
+            <EditText
+                android:id="@+id/fecha"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="false"
+                android:cursorVisible="false"
+                android:drawableRight="@drawable/calendar"
+                android:hint="Fecha" />
+
+        </android.support.design.widget.TextInputLayout>
+
+    <View
+        android:id="@+id/view"
+        android:layout_width="match_parent"
+        android:layout_below="@id/fecha"
+        android:layout_margin="20dp"
+        android:layout_height="0.5dp"
+        android:background="@color/black"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/myRecycler"
+        android:background="@color/blue_grey_700"
+        android:layout_below="@id/view"
+        android:layout_margin="6dp"
+        android:alpha="0.5"
+        android:layout_gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+
+    </android.support.v7.widget.RecyclerView>
+
+        <ProgressBar
+            android:id="@+id/progressbar"
+            android:layout_gravity="center|center_vertical"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            />
+
+    </LinearLayout>
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_margin="6dp"
+        android:layout_height="0dp"
+         android:layout_weight="1"        >
+
+        <fragment
+            android:id="@+id/map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toTopOf="@id/botonReserva"
+            android:layout_margin="5dp"/>
+
+
+        <Button
+            android:id="@+id/botonReserva"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/rounded_button"
+            android:text="RESERVAR"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:textColor="@color/white"
+            android:textSize="20sp" />
+
+    </android.support.constraint.ConstraintLayout>
+
+</LinearLayout>

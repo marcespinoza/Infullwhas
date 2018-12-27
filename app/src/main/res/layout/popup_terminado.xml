@@ -1,0 +1,28 @@
+<LinearLayout android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/rounded_popup_terminado"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            android:textSize="17sp"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:fontFamily="@font/roboto_blackitalic"
+            android:text="Marcar el lavado \n como terminado?"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textSize="15sp"
+            android:padding="5dp"
+            android:textColor="#37474f"
+            android:layout_margin="20dp"
+            android:background="@drawable/terminado_button"
+            android:text="CORRECTO"/>
+
+    </LinearLayout>
