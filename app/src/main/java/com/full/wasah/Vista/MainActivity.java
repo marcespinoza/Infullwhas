@@ -2,6 +2,7 @@ package com.full.wasah.Vista;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
 import android.graphics.Color;
@@ -13,8 +14,10 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -49,6 +52,7 @@ import com.pixplicity.easyprefs.library.Prefs;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -83,6 +87,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     String dbFormat = "yyyy-MM-dd";
     SimpleDateFormat sdf = new SimpleDateFormat(dbFormat, Locale.US);
     SimpleDateFormat sdf2 = new SimpleDateFormat(myFormat);
+    ValueEventListener listener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     }
                 });
 
-         popup.show();//showing popup menu
+         popup.show();
             }
         });
         progressBar = findViewById(R.id.progressbar);
@@ -178,10 +183,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             public void onDateSet(DatePicker view, int year, int monthOfYear,
                                   int dayOfMonth) {
                 // TODO Auto-generated method stub
+                Calendar c= Calendar.getInstance();
                 myCalendar.set(Calendar.YEAR, year);
                 myCalendar.set(Calendar.MONTH, monthOfYear);
                 myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-                updateLabel();
+                if(myCalendar.get(Calendar.YEAR) >= c.get(Calendar.YEAR) && myCalendar.get(Calendar.MONTH) >= c.get(Calendar.MONTH) && myCalendar.get(Calendar.DAY_OF_MONTH) >= c.DAY_OF_MONTH){
+                    updateLabel();
+                }else{
+                    mostrarError("Fecha no válida");
+                }
             }
 
         };
@@ -190,8 +200,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             @Override
             public void onClick(View v) {
-                new DatePickerDialog(MainActivity.this, date, myCalendar
-                        .get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
+                new DatePickerDialog(MainActivity.this, date, myCalendar.get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
                         myCalendar.get(Calendar.DAY_OF_MONTH)).show();
             }
         });
@@ -205,21 +214,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     void mostrarError(String message){
         new Flashbar.Builder(MainActivity.this)
                 .gravity(Flashbar.Gravity.TOP)
-                .duration(3000)
+                .duration(4000)
                 .backgroundColorRes(R.color.red_400)
                 .message(message)
                 .build()
                 .show();
     }
 
-    void initPrefs(){
-        new Prefs.Builder()
-                .setContext(this)
-                .setMode(ContextWrapper.MODE_PRIVATE)
-                .setPrefsName("reserva")
-                .setUseDefaultSharedPreference(true)
-                .build();
-    }
 
     private void updateLabel() {
 
@@ -228,7 +229,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         map.put("vehiculo","");
         map.put("patente","");
         map.put("telefono","");
-        map.put("fecha","");
         map.put("estado","libre");
         progressBar.setVisibility(View.VISIBLE);
         edittextFecha.setText(sdf2.format(myCalendar.getTime()));
@@ -240,6 +240,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }else{
                     for (int i = 0; i < horarios.length; i++){
                     map.put("hora",horarios[i]);
+                    map.put("fecha",sdf.format(myCalendar.getTime()));
                     firebaseDatabase.getReference().child("turno/"+sdf.format(myCalendar.getTime())+"/"+horarios[i]).setValue(map);}
                 }
                 progressBar.setVisibility(View.GONE);
@@ -253,14 +254,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
 
         databaseReference = firebaseDatabase.getReference("turno/"+sdf.format(myCalendar.getTime()));
-        databaseReference.addValueEventListener(new ValueEventListener() {
+        listener = databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 listaTurno.clear();
-                for(DataSnapshot dataSnapshot1: dataSnapshot.getChildren()){
-                    if(dataSnapshot1.exists()){
+                for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
+                    if (dataSnapshot1.exists()) {
                         Turno t = dataSnapshot1.getValue(Turno.class);
-                        listaTurno.add(t);}
+                        listaTurno.add(t);
+                    }
                 }
                 turnoAdapter = new TurnoAdapter(MainActivity.this, listaTurno, new TurnoAdapter.OnItemCheckListener() {
                     @Override
@@ -281,12 +283,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(final GoogleMap googleMap) {
         LatLng sydney = new LatLng(-34.295195, -60.241532);
-        googleMap.addMarker(new MarkerOptions().position(sydney).snippet("25 de mayo 1.041 - Salto Bs. As.")
-                .title("Infullwhas")).setVisible(true);
+        googleMap.addMarker(new MarkerOptions().position(sydney).snippet("25 de mayo 1.041 - Salto Bs. As.").title("Infullwhas")).setVisible(true);
         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(-34.295195, -60.241532), 15));
     }
-
-
 
     @Override
     public void getDatos() {
@@ -303,8 +302,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         dialog.dismiss();
         edittextFecha.setText("");
         hora="";
-        recyclerView.setAdapter(null);
-        turnoAdapter.notifyDataSetChanged();
+        databaseReference.removeEventListener(listener);
+        listaTurno.clear();
+        turnoAdapter =  new TurnoAdapter(MainActivity.this, new ArrayList<Turno>());
+        recyclerView.setAdapter(turnoAdapter);
         Handler handler = new Handler();
         handler.postDelayed(new Runnable()  {
             @Override

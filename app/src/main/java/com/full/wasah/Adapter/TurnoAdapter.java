@@ -23,6 +23,11 @@ public class TurnoAdapter extends RecyclerView.Adapter<TurnoAdapter.MyViewHolder
     private int lastSelectedPosition = -1;
     public OnItemCheckListener mCallback;
 
+    public TurnoAdapter(Context context, ArrayList<Turno> turnos) {
+        this.context = context;
+        this.turnos = turnos;
+    }
+
     public TurnoAdapter(Context context, ArrayList<Turno> turnos, OnItemCheckListener mCallback) {
         this.context = context;
         this.turnos = turnos;

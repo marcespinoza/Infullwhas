@@ -11,12 +11,19 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.full.wasah.Adapter.TurnoAdapter;
 import com.full.wasah.Adapter.TurnoAdapterAdmin;
+import com.full.wasah.Interface.InterfaceAdmin;
+import com.full.wasah.Interface.InterfaceReserva;
+import com.full.wasah.Presentador.AdminPresentador;
+import com.full.wasah.Presentador.ReservaPresentador;
 import com.full.wasah.R;
+import com.full.wasah.Util.ReservaApplication;
 import com.full.wasah.Util.Turno;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -29,7 +36,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
 
-public class AdminActivity extends AppCompatActivity {
+public class AdminActivity extends AppCompatActivity implements InterfaceAdmin.Vista{
 
     RecyclerView adminRecycler;
     FirebaseDatabase firebaseDatabase;
@@ -42,6 +49,7 @@ public class AdminActivity extends AppCompatActivity {
     SimpleDateFormat sdf2 = new SimpleDateFormat(myFormat);
     String dbFormat = "yyyy-MM-dd";
     ArrayList<Turno> listaTurno;
+    private InterfaceAdmin.Presentador presentador;
     TurnoAdapterAdmin turnoAdapterAdmin;
     SimpleDateFormat sdf = new SimpleDateFormat(dbFormat, Locale.US);
 
@@ -78,6 +86,7 @@ public class AdminActivity extends AppCompatActivity {
             }
 
         };
+        presentador = new AdminPresentador(AdminActivity.this);
     }
 
     private void mostrarTurnos(){
@@ -86,24 +95,39 @@ public class AdminActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 listaTurno.clear();
+                if(dataSnapshot.exists()){
                 for(DataSnapshot dataSnapshot1: dataSnapshot.getChildren()){
-                    if(dataSnapshot1.exists()){
                         Turno t = dataSnapshot1.getValue(Turno.class);
-                        listaTurno.add(t);}
+                        listaTurno.add(t);
+
                 }
                 turnoAdapterAdmin = new TurnoAdapterAdmin(AdminActivity.this, listaTurno, new TurnoAdapterAdmin.OnLongItemListener() {
                     @Override
-                    public void onLong(String item) {
+                    public void onLong(String estado, final String fecha, final String hora,final String telefono) {
+                        if(estado.equals("reservado")) {
                         dialog = new Dialog(AdminActivity.this);
                         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
                         dialog.setContentView(R.layout.popup_terminado);
-                        dialog.show();
+                        Button correcto = dialog.findViewById(R.id.correcto);
+                        correcto.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                presentador.modificarTurno(fecha, hora, telefono);
+                                dialog.dismiss();
+                            }
+                        });
+                        dialog.show();}
+                        else{
+                            Toast.makeText(AdminActivity.this, "Seleccione un turno reservado",Toast.LENGTH_SHORT).show();
+                        }
                     }
                 });
-                adminRecycler.setHasFixedSize(true);
-                adminRecycler.setAdapter(turnoAdapterAdmin);
-                adminRecycler.setItemAnimator(new DefaultItemAnimator());
-
+                   adminRecycler.setHasFixedSize(true);
+                   adminRecycler.setAdapter(turnoAdapterAdmin);
+                   adminRecycler.setItemAnimator(new DefaultItemAnimator());
+                }else{
+                    Toast.makeText(ReservaApplication.getAppContext(), "No hay turnos reservados para la fecha seleccionada", Toast.LENGTH_LONG).show();
+                }
             }
 
             @Override
@@ -111,5 +135,11 @@ public class AdminActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    @Override
+    public void toastExito() {
+
+
     }
 }

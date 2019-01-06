@@ -39,7 +39,7 @@ public class TurnoAdapterAdmin extends RecyclerView.Adapter<TurnoAdapterAdmin.My
     }
 
     public interface OnLongItemListener {
-        void onLong(String item);
+        void onLong(String estado, String fecha, String hora, String telefono);
     }
 
     @NonNull
@@ -72,8 +72,7 @@ public class TurnoAdapterAdmin extends RecyclerView.Adapter<TurnoAdapterAdmin.My
         myViewHolder.setItemLongClickListener(new ItemLongClickListener() {
             @Override
             public void onLongItemClick(int i) {
-                Log.i("loong",""+turnos.get(i).getHora());
-                onLongItemListener.onLong(turnos.get(i).getHora());
+                onLongItemListener.onLong(turnos.get(i).getEstado(), turnos.get(i).getFecha(), turnos.get(i).getHora(), turnos.get(i).getTelefono());
 
             }
         });
