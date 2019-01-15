@@ -39,7 +39,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="20sp"
-            android:inputType="numberPassword"
+            android:inputType="text"
             android:hint="Contraseña" />
 
     </android.support.design.widget.TextInputLayout>
@@ -73,13 +73,12 @@
             android:text="Cerrar"/>
 
     <TextView
-        android:id="@+id/error"
+        android:id="@+id/errorLogin"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Usuario/contraseña incorrectos"
         android:fontFamily="@font/roboto_thin"
         android:gravity="center"
-        android:textColor="@color/white"/>
+        android:textColor="@color/red_600"/>
 
     <LinearLayout
         android:background="@color/red_600"

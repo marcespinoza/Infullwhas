@@ -17,6 +17,10 @@ import com.full.wasah.Util.ReservaApplication;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class ReservaModelo implements InterfaceReserva.Modelo {
 
     InterfaceReserva.Presentador presentador;
@@ -25,6 +29,8 @@ public class ReservaModelo implements InterfaceReserva.Modelo {
     private NotificationManager mNotificationManager;
     private NotificationCompat.Builder mBuilder;
     public static final String NOTIFICATION_CHANNEL_ID = "10001";
+    SimpleDateFormat oldDate = new SimpleDateFormat("yyyy-MM-dd");
+    SimpleDateFormat newDate = new SimpleDateFormat("dd-MM-yyyy");
 
     public ReservaModelo(ReservaPresentador reservaPresentador) {
         presentador = reservaPresentador;
@@ -34,12 +40,18 @@ public class ReservaModelo implements InterfaceReserva.Modelo {
 
     @Override
     public void guardarTurno(String nya, String patente, String vehiculo, String telefono, String fecha, String hora) {
+        Date date = null;
+        try {
+           date = oldDate.parse(fecha);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
         referenciaTurno.child(fecha).child(hora).child("nya").setValue(nya);
         referenciaTurno.child(fecha).child(hora).child("telefono").setValue(telefono);
         referenciaTurno.child(fecha).child(hora).child("patente").setValue(patente);
         referenciaTurno.child(fecha).child(hora).child("estado").setValue("reservado");
         referenciaTurno.child(fecha).child(hora).child("vehiculo").setValue(vehiculo);
-        createNotification("Turno reservado","El día "+fecha+" a las "+hora+".");
+        createNotification("Turno reservado","El día "+newDate.format(date)+" a las "+hora+".");
         presentador.guardadoCorrecto();
     }
 

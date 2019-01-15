@@ -3,6 +3,9 @@ package com.full.wasah.Modelo;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.util.Log;
+
+import com.crashlytics.android.Crashlytics;
 import com.full.wasah.Interface.InterfaceAdmin;
 import com.full.wasah.Presentador.AdminPresentador;
 import com.full.wasah.Util.ReservaApplication;
@@ -26,17 +29,16 @@ public class AdminModelo implements InterfaceAdmin.Modelo {
     @Override
     public void turnoTerminado(String fecha, String hora, String telefono) {
         referenciaTurno.child(fecha).child(hora).child("estado").setValue("terminado");
-        PackageManager packageManager = ReservaApplication.getAppContext().getPackageManager();
-        Intent i = new Intent(Intent.ACTION_VIEW);
-
         try {
-            String url = "https://api.whatsapp.com/send?phone=54"+telefono+"&text=" + URLEncoder.encode("Su automovil esta listo para retirar.", "UTF-8");
-            i.setPackage("com.whatsapp");
-            i.setData(Uri.parse(url));
-            if (i.resolveActivity(packageManager) != null) {
-                ReservaApplication.getAppContext().startActivity(i);
-            }
+            String url = "https://api.whatsapp.com/send?phone=54"+telefono+"&text=" + URLEncoder.encode("Su vehículo está listo. Quejas y sugerencias al mismo número. MUCHAS GRACIAS POR SU PREFERENCIA!!!");
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+           intent.setData(Uri.parse(url));
+           intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+           ReservaApplication.getAppContext().startActivity(intent);
+
         } catch (Exception e){
+            Crashlytics.logException(new RuntimeException("FULLWASH"+e.getMessage().toString()));
+            Log.i("guasaaa","guasaaa"+e.getMessage().toString());
             e.printStackTrace();
         }
 

@@ -65,6 +65,8 @@ dependencies {
     implementation 'com.pixplicity.easyprefs:library:1.9.0'
     implementation 'com.andrognito.flashbar:flashbar:1.0.3'
     implementation 'com.github.faruktoptas:FancyShowCaseView:1.1.2'
+    implementation 'com.jakewharton:butterknife:8.5.1'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'

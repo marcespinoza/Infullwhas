@@ -30,7 +30,6 @@ public class TurnoAdapterAdmin extends RecyclerView.Adapter<TurnoAdapterAdmin.My
     Context context;
     ArrayList<Turno> turnos;
     public OnLongItemListener onLongItemListener;
-    AdapterView.OnItemLongClickListener onItemLongClickListener;
 
     public TurnoAdapterAdmin(Context context, ArrayList<Turno> turnos, OnLongItemListener onLongItemListener) {
         this.context = context;
@@ -68,6 +67,7 @@ public class TurnoAdapterAdmin extends RecyclerView.Adapter<TurnoAdapterAdmin.My
         else if (turnos.get(i).getVehiculo().toLowerCase().contains("chevrolet")) {myViewHolder.marca.setBackgroundResource(R.drawable.ic_chevrolet);}
         else if (turnos.get(i).getVehiculo().toLowerCase().contains("volkswagen")) {myViewHolder.marca.setBackgroundResource(R.drawable.ic_volkswagen);}
         else if (turnos.get(i).getVehiculo().toLowerCase().contains("ford")) {myViewHolder.marca.setBackgroundResource(R.drawable.ic_ford);}
+        else if (turnos.get(i).getVehiculo().toLowerCase().contains("kia")) {myViewHolder.marca.setBackgroundResource(R.drawable.ic_kia);}
         else{myViewHolder.marca.setBackgroundResource(android.R.color.transparent);}
         myViewHolder.setItemLongClickListener(new ItemLongClickListener() {
             @Override

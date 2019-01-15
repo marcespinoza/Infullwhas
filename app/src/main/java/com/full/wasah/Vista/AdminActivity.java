@@ -2,6 +2,8 @@ package com.full.wasah.Vista;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.content.ContextWrapper;
+import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -14,6 +16,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.full.wasah.Adapter.TurnoAdapter;
@@ -30,6 +34,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.pixplicity.easyprefs.library.Prefs;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -44,6 +49,7 @@ public class AdminActivity extends AppCompatActivity implements InterfaceAdmin.V
     EditText fecha;
     Dialog dialog;
     Calendar myCalendar;
+    TextView cerrarSesion;
     DatePickerDialog.OnDateSetListener date;
     String myFormat = "yyyy-MM-dd";
     SimpleDateFormat sdf2 = new SimpleDateFormat(myFormat);
@@ -52,12 +58,24 @@ public class AdminActivity extends AppCompatActivity implements InterfaceAdmin.V
     private InterfaceAdmin.Presentador presentador;
     TurnoAdapterAdmin turnoAdapterAdmin;
     SimpleDateFormat sdf = new SimpleDateFormat(dbFormat, Locale.US);
+    ImageView logout;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin);
         adminRecycler = findViewById(R.id.adminRecycler);
+        initPrefs();
+        logout = findViewById(R.id.logout);
+        logout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Prefs.putBoolean("login", false);
+                Intent i = new Intent(getApplicationContext(), MainActivity.class);
+                startActivity(i);
+                finish();
+            }
+        });
         myCalendar = Calendar.getInstance();
         listaTurno = new ArrayList<>();
         adminRecycler.setLayoutManager(new GridLayoutManager(this, 3));
@@ -135,6 +153,15 @@ public class AdminActivity extends AppCompatActivity implements InterfaceAdmin.V
 
             }
         });
+    }
+
+    void initPrefs(){
+        new Prefs.Builder()
+                .setContext(this)
+                .setMode(ContextWrapper.MODE_PRIVATE)
+                .setPrefsName(getPackageName())
+                .setUseDefaultSharedPreference(true)
+                .build();
     }
 
     @Override

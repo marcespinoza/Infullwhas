@@ -6,27 +6,26 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import com.andrognito.flashbar.Flashbar;
 import com.full.wasah.Adapter.TurnoAdapter;
 import com.full.wasah.Interface.InterfaceReserva;
@@ -48,35 +47,35 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.pixplicity.easyprefs.library.Prefs;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import me.toptas.fancyshowcase.FancyShowCaseView;
 
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, InterfaceReserva.Vista{
 
-
     EditText edittextFecha, nyap, patente, celular, vehiculo;
     private InterfaceReserva.Presentador presentadorReserva;
     Calendar myCalendar;
-    Dialog dialog, administrar;
-    TextView error;
-    ProgressBar progressBar;
+    Dialog dialog, administrar, about;
+    TextView error, cerrar, errorLogin;
+    @BindView(R.id.progressbar) ProgressBar progressBar;
     ImageButton imageBtn;
     String hora = "";
     DatePickerDialog.OnDateSetListener date;
     Button botonReserva, aceptar, cancelar, iniciarSesion;
     SupportMapFragment mapFragment;
+    CheckBox checksesion;
     FirebaseDatabase firebaseDatabase;
     DatabaseReference databaseReference, referenciaTurno;
-    RecyclerView recyclerView;
+    EditText usuario, contraseña;
+    @BindView(R.id.myRecycler) RecyclerView recyclerView;
     ArrayList <Turno> listaTurno;
     TurnoAdapter turnoAdapter;
     String[] horarios = {"07:00","07:20","07:40","08:00","08:20","08:40","09:00","09:20","09:40","10:00","10:20","10:40","11:00","11:20"
@@ -93,8 +92,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
+        initPrefs();
+        if(Prefs.getBoolean("login",false)){
+            Intent i = new Intent(getApplicationContext(), AdminActivity.class);
+            startActivity(i);
+            finish();
+        }
         myCalendar = Calendar.getInstance();
-        recyclerView = findViewById(R.id.myRecycler);
         recyclerView.setLayoutManager(new GridLayoutManager(this, 4));
         listaTurno = new ArrayList<>();
         edittextFecha =  findViewById(R.id.fecha);
@@ -107,17 +112,45 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 popup.getMenuInflater().inflate(R.menu.menu, popup.getMenu());
                 popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     public boolean onMenuItemClick(MenuItem item) {
+                        if(!item.getTitle().toString().equalsIgnoreCase("Administrar")){
+                          about= new Dialog(MainActivity.this);
+                          about.setContentView(R.layout.about_popup);
+                          about.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+                          about.show();
+                        }else{
                         administrar = new Dialog(MainActivity.this);
                         administrar.setContentView(R.layout.login_popup);
+                        checksesion = administrar.findViewById(R.id.checksesion);
+                        usuario = administrar.findViewById(R.id.usuario);
+                        contraseña = administrar.findViewById(R.id.contraseña);
                         iniciarSesion = administrar.findViewById(R.id.aceptarsesion);
+                        cerrar = administrar.findViewById(R.id.cerrar);
+                        cerrar.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                administrar.dismiss();
+                            }
+                        });
+                        errorLogin = administrar.findViewById(R.id.errorLogin);
                         iniciarSesion.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
-                                Intent i = new Intent(getApplicationContext(), AdminActivity.class);
-                                startActivity(i);
+                                if(usuario.getText().toString().equalsIgnoreCase("josequinonez") && contraseña.getText().toString().equalsIgnoreCase("cerro1912")){
+                                    if(checksesion.isChecked()){
+                                        Prefs.putBoolean("login", true);
+                                    }else{
+                                        Prefs.putBoolean("login", true);
+                                    }
+                                 Intent i = new Intent(getApplicationContext(), AdminActivity.class);
+                                 startActivity(i);
+                                 finish();
+                                }else{
+                                    errorLogin.setText("Usuario/Contraseña erróneo");
+                                }
                             }
                         });
                         administrar.show();
+                        }
                         return true;
                     }
                 });
@@ -125,7 +158,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
          popup.show();
             }
         });
-        progressBar = findViewById(R.id.progressbar);
         progressBar.setVisibility(View.INVISIBLE);
         firebaseDatabase = FirebaseDatabase.getInstance();
         botonReserva = findViewById(R.id.botonReserva);
@@ -138,7 +170,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
                 else if(hora.isEmpty()){
                     mostrarError("Seleccione un horario");
-                }else{dialog = new Dialog(MainActivity.this);
+                }else{
+                   if(isOnline(MainActivity.this)) {
+                    dialog = new Dialog(MainActivity.this);
                     dialog.setContentView(R.layout.popup);
                     nyap = dialog.findViewById(R.id.nya);
                     patente = dialog.findViewById(R.id.patente);
@@ -159,16 +193,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             dialog.dismiss();
                         }
                     });
-                    dialog.show();
+                    dialog.show();}
+                    else{
+                       mostrarError("Revisa tu conexión");
+                   }
                 }
             }
         });
-        new Prefs.Builder()
-                .setContext(this)
-                .setMode(ContextWrapper.MODE_PRIVATE)
-                .setPrefsName(getPackageName())
-                .setUseDefaultSharedPreference(true)
-                .build();
         if(!Prefs.getBoolean("init", false)){
             new FancyShowCaseView.Builder(this)
                     .focusOn(edittextFecha)
@@ -187,7 +218,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 myCalendar.set(Calendar.YEAR, year);
                 myCalendar.set(Calendar.MONTH, monthOfYear);
                 myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-                if(myCalendar.get(Calendar.YEAR) >= c.get(Calendar.YEAR) && myCalendar.get(Calendar.MONTH) >= c.get(Calendar.MONTH) && myCalendar.get(Calendar.DAY_OF_MONTH) >= c.DAY_OF_MONTH){
+                if(myCalendar.get(Calendar.YEAR) >= c.get(Calendar.YEAR) && myCalendar.get(Calendar.MONTH) >= c.get(Calendar.MONTH) && myCalendar.get(Calendar.DAY_OF_MONTH) >= c.get(Calendar.DAY_OF_MONTH)){
                     updateLabel();
                 }else{
                     mostrarError("Fecha no válida");
@@ -221,6 +252,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .show();
     }
 
+    void initPrefs(){
+        new Prefs.Builder()
+                .setContext(this)
+                .setMode(ContextWrapper.MODE_PRIVATE)
+                .setPrefsName(getPackageName())
+                .setUseDefaultSharedPreference(true)
+                .build();
+    }
 
     private void updateLabel() {
 
@@ -285,6 +324,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         LatLng sydney = new LatLng(-34.295195, -60.241532);
         googleMap.addMarker(new MarkerOptions().position(sydney).snippet("25 de mayo 1.041 - Salto Bs. As.").title("Infullwhas")).setVisible(true);
         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(-34.295195, -60.241532), 15));
+    }
+
+    public static boolean isOnline(Context context) {
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        return networkInfo != null && networkInfo.isAvailable() && networkInfo.isConnected();
     }
 
     @Override

@@ -54,7 +54,7 @@
                 android:clickable="true"
                 android:focusable="false"
                 android:cursorVisible="false"
-                android:drawableRight="@drawable/calendar"
+                android:drawableRight="@drawable/ic_calendar"
                 android:hint="Fecha" />
 
         </android.support.design.widget.TextInputLayout>
