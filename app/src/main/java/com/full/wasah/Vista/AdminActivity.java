@@ -1,7 +1,9 @@
 package com.full.wasah.Vista;
 
+import android.app.ActivityManager;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
@@ -27,6 +29,7 @@ import com.full.wasah.Interface.InterfaceReserva;
 import com.full.wasah.Presentador.AdminPresentador;
 import com.full.wasah.Presentador.ReservaPresentador;
 import com.full.wasah.R;
+import com.full.wasah.Util.NotificacionReserva;
 import com.full.wasah.Util.ReservaApplication;
 import com.full.wasah.Util.Turno;
 import com.google.firebase.database.DataSnapshot;
@@ -59,6 +62,8 @@ public class AdminActivity extends AppCompatActivity implements InterfaceAdmin.V
     TurnoAdapterAdmin turnoAdapterAdmin;
     SimpleDateFormat sdf = new SimpleDateFormat(dbFormat, Locale.US);
     ImageView logout;
+    Intent intent;
+    NotificacionReserva notificacionReserva;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -70,6 +75,7 @@ public class AdminActivity extends AppCompatActivity implements InterfaceAdmin.V
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                stopService(new Intent(getBaseContext(), NotificacionReserva.class));
                 Prefs.putBoolean("login", false);
                 Intent i = new Intent(getApplicationContext(), MainActivity.class);
                 startActivity(i);
@@ -105,6 +111,24 @@ public class AdminActivity extends AppCompatActivity implements InterfaceAdmin.V
 
         };
         presentador = new AdminPresentador(AdminActivity.this);
+        notificacionReserva = new NotificacionReserva(this);
+        intent = new Intent(this, notificacionReserva.getClass());
+        if (!isMyServiceRunning(NotificacionReserva.class)) {
+            startService(new Intent(getBaseContext(), NotificacionReserva.class));
+        }
+
+    }
+
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                Log.i ("isMyServiceRunning?", true+"");
+                return true;
+            }
+        }
+        Log.i ("isMyServiceRunning?", false+"");
+        return false;
     }
 
     private void mostrarTurnos(){
@@ -166,7 +190,13 @@ public class AdminActivity extends AppCompatActivity implements InterfaceAdmin.V
 
     @Override
     public void toastExito() {
+    }
 
+    @Override
+    protected void onDestroy() {
+        Log.i("MAINACT", "onDestroy!");
+        super.onDestroy();
 
     }
+
 }

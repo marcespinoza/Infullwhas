@@ -19,7 +19,8 @@
                                   <option name="values">
                                     <map>
                                       <entry key="assetType" value="IMAGE" />
-                                      <entry key="imageAsset" value="F:\Users\ACER CORE I7\Desktop\car_wash.png" />
+                                      <entry key="imageAsset" value="F:\Users\ACER CORE I7\Desktop\icnoti.png" />
+                                      <entry key="outputName" value="ic_alert" />
                                     </map>
                                   </option>
                                 </PersistentState>

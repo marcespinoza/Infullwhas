@@ -18,7 +18,7 @@ repositories {
 android {
     signingConfigs {
         myConfig {
-            storeFile file("F:/Android/comfullwasah/fullwasah.jks")
+            storeFile file("F:/Android/infullwhas/fullwasah.jks")
             storePassword "fullwasah"
             keyAlias "fullwasah"
             keyPassword "fullwasah"

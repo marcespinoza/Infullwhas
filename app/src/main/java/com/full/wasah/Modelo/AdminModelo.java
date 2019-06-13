@@ -1,13 +1,20 @@
 package com.full.wasah.Modelo;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.net.Uri;
+import android.provider.Settings;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
 import com.full.wasah.Interface.InterfaceAdmin;
 import com.full.wasah.Presentador.AdminPresentador;
+import com.full.wasah.R;
 import com.full.wasah.Util.ReservaApplication;
 import com.full.wasah.Util.Turno;
 import com.google.firebase.database.DataSnapshot;
@@ -42,9 +49,8 @@ public class AdminModelo implements InterfaceAdmin.Modelo {
 
         } catch (Exception e){
             Crashlytics.logException(new RuntimeException("FULLWASH"+e.getMessage().toString()));
-            Log.i("guasaaa","guasaaa"+e.getMessage().toString());
             e.printStackTrace();
         }
-
     }
+
 }
