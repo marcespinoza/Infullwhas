@@ -1,4 +1,7 @@
-Infullwhas
+Infullwhas: Reserva de turnos para lavadero de autos.
+
+Firebase realtime database
+MVP
 
 ![Screenshot_2019-06-13-18-23-18-422_com full wasah](https://user-images.githubusercontent.com/5660282/59471288-0de1c980-8e11-11e9-8adb-b37de409ffce.png)
 ![Screenshot_2019-06-13-18-23-36-379_com full wasah](https://user-images.githubusercontent.com/5660282/59471289-0e7a6000-8e11-11e9-8068-adea38957bc9.png)
